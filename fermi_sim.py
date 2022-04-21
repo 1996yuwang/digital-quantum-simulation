@@ -1,3 +1,5 @@
+#Most of the code in this file are written by Christian Mendl
+
 import numpy as np
 from scipy.sparse import csr_matrix
 from gmpy2 import popcount
