@@ -19,7 +19,7 @@ H_Quad_encoded_perio: Encoded Hamiltonian of the model with periodic boundary co
 import numpy as np
 from scipy import sparse
 from gmpy2 import popcount
-from encoding import construct_edge_operator, construct_vertex_operator
+from encoding import construct_edge_operator, construct_vertex_operator, num_qubits_encoding
 from fermi_sim import create_op, annihil_op
 
 
