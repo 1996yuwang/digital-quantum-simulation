@@ -19,7 +19,7 @@ H_Quad_encoded_perio: Encoded Hamiltonian of the model with periodic boundary co
 import numpy as np
 from scipy import sparse
 from gmpy2 import popcount
-from encoding import construct_edge_operator, construct_vertex_operator, num_qubits_encoding
+from encoding import construct_edge_operator, construct_vertex_operator, num_qubits_encoding, _vertex_to_ordered_index
 from fermi_sim import create_op, annihil_op
 
 
@@ -471,3 +471,28 @@ def end_to_head_vert(lattsize, i, j):
     E = (1j)**(i[0]-1)*E
 
     return E
+
+def sup_normal(size_cell):
+    L0 = 2* size_cell[0]
+    L1 = 2* size_cell[1]
+    nmodes = L0*L1
+    H = sparse.csr_matrix((2**nmodes, 2**nmodes), dtype=float)
+    
+    for a in range(L0):
+        for b in range(L1):
+            for c in range(L0):
+                for d in range(L1):
+                    
+                    if a == c and b - d ==1:
+                        i = _vertex_to_ordered_index((L0,L1), (a,b))
+                        j = _vertex_to_ordered_index((L0,L1), (c,d))
+                        H += create_op(nmodes, 2**i).dot(create_op(nmodes, 2**j))
+                        H += annihil_op(nmodes, 2**j).dot(annihil_op(nmodes, 2**i))
+                        
+                    if a - c == 1 and b == d:
+                        
+                        i = _vertex_to_ordered_index((L0,L1), (a,b))
+                        j = _vertex_to_ordered_index((L0,L1), (c,d))
+                        H += create_op(nmodes, 2**i).dot(create_op(nmodes, 2**j))
+                        H += annihil_op(nmodes, 2**j).dot(annihil_op(nmodes, 2**i))
+    return (H)
