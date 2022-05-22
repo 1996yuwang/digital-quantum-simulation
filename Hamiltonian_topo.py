@@ -496,3 +496,43 @@ def sup_normal(size_cell):
                         H += create_op(nmodes, 2**i).dot(create_op(nmodes, 2**j))
                         H += annihil_op(nmodes, 2**j).dot(annihil_op(nmodes, 2**i))
     return (H)
+
+
+
+def _index_to_vertex(lattsize, i):
+    # indices for sites: 0, 1, 2......
+    cord0 = i // lattsize[1]
+    cord1 = i  % lattsize[1]
+    return (cord0, cord1)
+
+
+def sup_encoded(size_cell):
+    
+    lattsize = (2*size_cell[0], 2*size_cell[1])
+    L0 = 2*size_cell[0]
+    L1 = 2*size_cell[1]
+    nqubits = num_qubits_encoding(lattsize)
+    H = sparse.csr_matrix((2**nqubits, 2**nqubits), dtype=complex)
+    sup = 1j/2
+    for x in range (L0*L1):
+        for y in range(L0*L1):
+            xind = _index_to_vertex(lattsize,x)
+            yind = _index_to_vertex(lattsize,y)
+
+
+            if yind[0]-xind[0] == 1:
+                if yind[1] == xind[1]:
+                    #H += (construct_edge_operator(lattsize,xind,yind))
+                    H += (construct_edge_operator(lattsize,xind,yind).dot(construct_vertex_operator(lattsize,yind)))
+                    H += -(construct_vertex_operator(lattsize,xind).dot(construct_edge_operator(lattsize,xind,yind)))
+                    #H += -((construct_vertex_operator(lattsize,xind).dot(construct_edge_operator(lattsize,xind,yind)))).dot(construct_vertex_operator(lattsize,yind))
+
+            if yind[1]-xind[1] == 1:
+                if yind[0] == xind[0]: 
+                    #H += (construct_edge_operator(lattsize,xind,yind))
+                    H += (construct_edge_operator(lattsize,xind,yind).dot(construct_vertex_operator(lattsize,yind)))
+                    H += -(construct_vertex_operator(lattsize,xind).dot(construct_edge_operator(lattsize,xind,yind)))
+                    #H += -((construct_vertex_operator(lattsize,xind).dot(construct_edge_operator(lattsize,xind,yind)))).dot(construct_vertex_operator(lattsize,yind))
+
+
+    return sup*H
